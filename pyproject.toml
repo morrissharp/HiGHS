@@ -35,6 +35,8 @@ test = ["pytest", "numpy"]
 [tool.scikit-build]
 cmake.args = ["-DPYTHON_BUILD_SETUP=ON"]
 wheel.expand-macos-universal-tags = true
+cmake.define.CUPDLP_GPU = {env = "HIGHS_BUILD_GPU", default = "OFF"}
+cmake.define.CUPDLP_FIND_CUDA = {env = "HIGHS_CUDA_FIND", default = "OFF"}
 
 # A list of packages to auto-copy into the wheel. If this is not set, it will
 # default to the first of ``src/<package>``, ``python/<package>``, or
