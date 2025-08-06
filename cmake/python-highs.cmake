@@ -90,14 +90,15 @@ if(CUPDLP_GPU)
     target_link_libraries(_core PRIVATE ${CUDA_LIBRARY} m)
   endif()
   
-  # Add preprocessor definition for GPU compilation
-  target_compile_definitions(_core PRIVATE CUPDLP_GPU)
-  
+
   message(STATUS "CUDA libraries: ${CUDA_LIBRARY}")
 endif()
 
 if(MSVC)
   target_compile_options(_core PRIVATE "/bigobj")
+else()
+  # Increase template instantiation depth for complex pybind11 bindings
+  target_compile_options(_core PRIVATE "-ftemplate-depth=1500")
 endif()
 
 # if(MSVC)
