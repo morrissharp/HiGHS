@@ -11,10 +11,18 @@ set(sources_python ${highs_sources_python}
                    ${ipx_sources_python} 
                    ${basiclu_sources_python})
 
+if (CUPDLP_GPU)
+  list(APPEND sources_python ${cuda_sources_python})
+endif()
+
 set(headers_python ${highs_headers_python} 
                    ${cupdlp_headers_python} 
                    ${ipx_headers_python} 
                    ${basiclu_headers_python})
+
+if (CUPDLP_GPU)
+  list(APPEND headers_python ${cuda_headers_python})
+endif()
 
 # Find Python 3
 find_package(Python COMPONENTS Interpreter Development.Module REQUIRED)
@@ -51,8 +59,46 @@ target_include_directories(_core PUBLIC ${include_dirs_python})
 # This is passing in the version as a define just as an example
 target_compile_definitions(_core PRIVATE VERSION_INFO=${PROJECT_VERSION})
 
+# GPU support configuration
+if(CUPDLP_GPU)
+  message(STATUS "Building Python extension with GPU support")
+  
+  # Enable CUDA language
+  enable_language(CUDA)
+  
+  # Find CUDA toolkit - use the same logic as main CMake
+  if (CUPDLP_FIND_CUDA)
+    # With FindCUDAConf.cmake
+    # Need to have the CUDA_HOME environment variable set.
+    include(FindCUDAConf)
+  else() 
+    # Without FindCUDAConf.cmake
+    find_package(CUDAToolkit REQUIRED)
+    set(CUDA_LIBRARY CUDA::cudart CUDA::cublas CUDA::cusparse)
+  endif()
+  
+  # Add CUDA include directories
+  target_include_directories(_core PRIVATE "$<BUILD_INTERFACE:${CMAKE_CUDA_PATH}/include>")
+  
+  # Set CUDA compilation properties
+  set_target_properties(_core PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
+  
+  # Link CUDA libraries
+  if (WIN32)
+    target_link_libraries(_core PRIVATE ${CUDA_LIBRARY})
+  else()
+    target_link_libraries(_core PRIVATE ${CUDA_LIBRARY} m)
+  endif()
+  
+
+  message(STATUS "CUDA libraries: ${CUDA_LIBRARY}")
+endif()
+
 if(MSVC)
   target_compile_options(_core PRIVATE "/bigobj")
+else()
+  # Increase template instantiation depth for complex pybind11 bindings
+  target_compile_options(_core PRIVATE "-ftemplate-depth=1500")
 endif()
 
 # if(MSVC)

@@ -44,10 +44,12 @@ set(cupdlp_headers_python
   highs/pdlp/cupdlp/cupdlp_utils.c)
 
 set(cuda_sources_python
-  pdlp/cupdlp/cuda/cupdlp_cuda_kernels.cu
-  pdlp/cupdlp/cuda/cupdlp_cuda_kernels.cuh
-  pdlp/cupdlp/cuda/cupdlp_cudalinalg.cuh
-  pdlp/cupdlp/cuda/cupdlp_cudalinalg.cu)
+  highs/pdlp/cupdlp/cuda/cupdlp_cuda_kernels.cu
+  highs/pdlp/cupdlp/cuda/cupdlp_cudalinalg.cu)
+
+set(cuda_headers_python
+  highs/pdlp/cupdlp/cuda/cupdlp_cuda_kernels.cuh
+  highs/pdlp/cupdlp/cuda/cupdlp_cudalinalg.cuh)
 
 set(basiclu_sources_python
   highs/ipm/basiclu/basiclu_factorize.c
